@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+      - media_volume:/app/media
+    command: >
+      sh -c "
+            pip install Pillow &&
+            python manage.py migrate &&
+            python manage.py makemigrations &&
+            python manage.py test &&
+            python manage.py runserver 0.0.0.0:8000"
+      
+volumes:
+  media_volume:
