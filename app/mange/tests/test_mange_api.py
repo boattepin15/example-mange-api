@@ -50,7 +50,6 @@ class PublicMangeApiTests(TestCase):
         manges = Mange.objects.all()
         serializer = MangeSerializer(manges, many=True)
         res = self.client.get(MANGE_URL)
-
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
         self.assertEqual(json.dumps(res.data), json.dumps(serializer.data))
@@ -112,7 +111,26 @@ class PublicMangeApiTests(TestCase):
         mange = Mange.objects.create(
            **payload
         )
-        res = self.client.put(MANGE_URL, id = mange.id)
+        res = self.client.delete(MANGE_URL, id = mange.id)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+    
 
+class PrivateMangeApiTests(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = user_admin()
+        self.client.force_authenticate(self.user)
+    
+    def test_create_mange_admin(self):
+        """ ทดสอบให้ แอดมินสร้าง Mnage """
+        payload = {
+            'title':'title',
+            'profile':'',
+            'author_by':'author_by',
+            'draw_by':'draw_by',
+            'upload_by':self.user.id
+        }
         
+        res = self.client.post(MANGE_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)

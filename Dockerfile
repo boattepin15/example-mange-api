@@ -34,10 +34,12 @@ RUN apk add --update --no-cache \
 RUN adduser \
         --disabled-password \
         --home /home/django-user \
-        django-user
+        django-user && \
+        mkdir -p /vol/web/media && \
+        mkdir -p /vol/web/media && \
+        chown -R django-user:django-user /vol && \
+        chmod -R 755 /vol
 
-# สร้างโฟลเดอร์และตั้งค่าสิทธิ์
-RUN mkdir -p /app/media/mange_profiles && chown -R django-user:django-user /app/media
 
 ENV PATH="/py/bin:$PATH"
 

@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core.models import Mange
+from core import models
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
+from unittest.mock import patch
 import os
 
 
@@ -111,10 +113,9 @@ class Tests_Model(TestCase):
             username='username',
             password='password1234'
         )
-        profile_image = SimpleUploadedFile(name='profile.png', content=b'', content_type='image/png')
         payload = {
             'title':'test title',
-            'profile':profile_image,
+            'profile':'',
             'author_by':'test author_by',
             'draw_by':'test draw_by',
             'upload_by':user
@@ -127,11 +128,12 @@ class Tests_Model(TestCase):
         self.assertEqual(mange.author_by, payload['author_by'])
         self.assertEqual(mange.draw_by, payload['draw_by'])
         self.assertEqual(mange.upload_by, payload['upload_by'])
-        self.assertEqual(mange.profile.url, str('/media/'+ str(mange.profile)))
-        # ลบไฟล์ที่ถูกสร้างขึ้นในระหว่างการทดสอบ
-        try:
-            for root, dirs, files in os.walk(settings.MEDIA_ROOT):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-        except Exception as e:
-            print(f"Error cleaning up media files: {e}")
+
+    @patch('core.models.uuid.uuid4')
+    def test_mange_file_name_uuid(self, mock_uuid):
+        """ ทดสอบ image Patch"""
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        file_path = models.mange_image_file_path(None, 'test.jpg')
+        
+        self.assertEqual(file_path, f'uploads/mange/{uuid}.jpg')

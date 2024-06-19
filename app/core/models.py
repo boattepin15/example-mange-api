@@ -1,4 +1,7 @@
 from django.db import models
+import uuid
+import os
+from unittest.mock import patch
 from django.contrib.auth.models import (
     AbstractBaseUser,  
     BaseUserManager,
@@ -6,8 +9,15 @@ from django.contrib.auth.models import (
 )
 from django.conf import settings
 
-
 from django.contrib.auth.models import BaseUserManager
+
+def mange_image_file_path(instance, filename):
+    """ สร้าง path สำหรับ mange profile"""
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+    return os.path.join('uploads', 'mange', filename)
+
+
 
 class UserManager(BaseUserManager):
     """ สร้างระบบ จัดการผู้ใช้งานและผู้ดูแล"""
@@ -63,12 +73,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Mange(models.Model):
     """สร้าง Models มังงะ (Mange)"""
     title = models.CharField(max_length=255)
-    profile = models.ImageField(upload_to='mange_profiles/', default='default.jpg')
+    profile = models.ImageField(null=True, upload_to=mange_image_file_path)
     author_by = models.CharField(max_length=255)
     draw_by = models.CharField(max_length=255)
     upload_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE 
     )
 
     def __str__(self):
