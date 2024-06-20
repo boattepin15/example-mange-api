@@ -3,8 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from mange.serializers import MangeSerializer, MangeImageserializer
-from core.models import Mange
+from mange.serializers import MangeSerializer, MangeImageserializer, EpisodeSerializer
+from core.models import Mange, Episode
 from mange.permissions import PublicReadOnly
 
 class MangeViewSet(viewsets.ModelViewSet):
@@ -30,3 +30,10 @@ class MangeViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class EpisodeViewset(viewsets.ModelViewSet):
+    """ สร้าง Viewset CRUD """
+    serializer_class = EpisodeSerializer
+    queryset = Episode.objects.all()
+    permission_classes = [IsAuthenticated | PublicReadOnly]
+    

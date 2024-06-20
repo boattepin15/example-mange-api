@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from core.models import Mange
+from core.models import Mange, Episode
+
+
+
+
 
 class MangeSerializer(serializers.ModelSerializer):
     """ สร้าง Serializer สำหรับ Mange Model"""
@@ -17,3 +21,16 @@ class MangeImageserializer(serializers.ModelSerializer):
         extra_kwargs = {
             'profile': {'required': True}
         }
+
+class EpisodeSerializer(serializers.ModelSerializer):
+    ''' สร้าง serializer สำหรับ ep หรือ ตอนสำหรับมังงะ'''
+    
+    # ใช้ PrimaryKeyRelatedField เพื่อให้แสดงเฉพาะ ID ของ Mange
+    #mange = serializers.PrimaryKeyRelatedField(queryset=Mange.objects.all())
+
+    # แสดง Json ของ Model Mange ด้วย MangeSerializer
+    mange = MangeSerializer(read_only=True)
+    class Meta:
+        model = Episode
+        fields = ['mange', 'ep','content']
+        read_only_fields = ['id']

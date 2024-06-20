@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from core.models import Mange
+from core.models import Mange, Episode
 from core import models
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
@@ -137,3 +137,28 @@ class Tests_Model(TestCase):
         file_path = models.mange_image_file_path(None, 'test.jpg')
         
         self.assertEqual(file_path, f'uploads/mange/{uuid}.jpg')
+    
+    def test_create_episodes(self):
+        """ทดสอบสร้างตอน หรือ episodes ให้กับ mange"""
+        user = get_user_model().objects.create_user(
+            email='email@test.com',
+            username='username',
+            password='password1234'
+        )
+        mange = Mange.objects.create(
+            title='ชื่อมังงะ',
+            profile=None,  
+            author_by='ผู้เขียน',
+            draw_by='ผู้วาด',
+            upload_by=user  
+        )
+
+        # ตอนนี้สร้าง Episode
+        episode = Episode.objects.create(
+            ep=1,  
+            content='เนื้อหา',
+            mange=mange
+        )
+        self.assertEqual(str(mange), 'ชื่อมังงะ')        
+        self.assertEqual(episode.ep, 1)
+        self.assertEqual(str(episode), '1')

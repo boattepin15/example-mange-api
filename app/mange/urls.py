@@ -8,6 +8,7 @@ app_name = 'mange'
 
 router = DefaultRouter()
 router.register('mange', views.MangeViewSet)
+router.register('episodes', views.EpisodeViewset)
 urlpatterns = [
     path('', include(router.urls)),
 ]

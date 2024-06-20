@@ -70,6 +70,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 
+
+
 class Mange(models.Model):
     """สร้าง Models มังงะ (Mange)"""
     title = models.CharField(max_length=255)
@@ -78,13 +80,21 @@ class Mange(models.Model):
     draw_by = models.CharField(max_length=255)
     upload_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE 
+        on_delete=models.PROTECT 
     )
+    
 
     def __str__(self):
         return self.title
  
     
+class Episode(models.Model):
+    """ ส้าง Model Epsode ตอน ของมังงะ"""
+    ep = models.IntegerField()
+    content = models.TextField()
+    mange = models.ForeignKey(Mange, on_delete=models.CASCADE)
 
-
+    def __str__(self):
+        return str(self.ep)
+    
     

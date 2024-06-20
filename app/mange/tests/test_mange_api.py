@@ -129,7 +129,7 @@ class PrivateMangeApiTests(TestCase):
             'profile':'',
             'author_by':'author_by',
             'draw_by':'draw_by',
-            'upload_by':self.user.id
+            'upload_by':self.user.id,
         }
         
         res = self.client.post(MANGE_URL, payload)
