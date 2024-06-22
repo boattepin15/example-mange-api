@@ -23,3 +23,4 @@ class ManagerUserView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """เมื่อผ่านการ authenticated ก็จะส่ง user กลับมา"""
         return self.request.user
+

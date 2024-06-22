@@ -8,8 +8,9 @@ app_name = 'mange'
 
 router = DefaultRouter()
 router.register('mange', views.MangeViewSet)
-router.register('episodes', views.EpisodeViewset)
 urlpatterns = [
     path('', include(router.urls)),
+    path('episodes/create', views.CreateEpisodeViewset.as_view(),name='episode-create'),
+    path('episodes/list', views.ListEpisodesViewset.as_view(), name='episodes-list')
 ]
 

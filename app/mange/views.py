@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status,generics 
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -31,9 +31,19 @@ class MangeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class EpisodeViewset(viewsets.ModelViewSet):
-    """ สร้าง Viewset CRUD """
+    """ สร้าง Viewset CRUD สำหรับ Episode """
     serializer_class = EpisodeSerializer
     queryset = Episode.objects.all()
     permission_classes = [IsAuthenticated | PublicReadOnly]
-    
+
+class CreateEpisodeViewset(generics.CreateAPIView):
+    serializer_class = EpisodeSerializer
+    queryset = Episode.objects.all()
+    permission_classes = [IsAuthenticated | PublicReadOnly]
+
+
+class ListEpisodesViewset(generics.ListAPIView):
+    serializer_class = EpisodeSerializer
+    queryset = Episode.objects.all()

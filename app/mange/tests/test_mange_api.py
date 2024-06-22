@@ -5,11 +5,15 @@ from django.urls import reverse
 import json
 from django.contrib.auth import get_user_model
 from mange.serializers import (
-    MangeSerializer
+    MangeSerializer,
+    EpisodeSerializer
 )
-from core.models import Mange
+from core.models import Mange, Episode
 
 MANGE_URL = reverse('mange:mange-list')
+#EPISODES_URL = reverse('mange:episode-list')
+EPISODE_CREATE_URL = reverse('mange:episode-create')
+EPISODES_LIST_URL = reverse('mange:episodes-list')
 
 def user_admin():
     return get_user_model().objects.create_superuser(
@@ -131,6 +135,59 @@ class PrivateMangeApiTests(TestCase):
             'draw_by':'draw_by',
             'upload_by':self.user.id,
         }
-        
         res = self.client.post(MANGE_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+    
+    def test_create_mange_episodes(self):
+        """ ทดสอบสร้าง Episode ของ Mnage"""
+        payload = {
+            'title':'title',
+            'profile':'',
+            'author_by':'author_by',
+            'draw_by':'draw_by',
+            'upload_by':self.user,
+            }
+        mange = Mange.objects.create(**payload)
+        episodes = Episode.objects.create(
+            mange_id=mange.id,
+            ep = 1,
+            content = "Test Content"
+        )
+        serializer = EpisodeSerializer(episodes)
+        res = self.client.post(EPISODE_CREATE_URL, {
+            'mange_id': mange.id,
+            'ep': 1,
+            'content': 'Test Content'
+        })
+        
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(serializer.data['mange'], res.data['mange'])
+        self.assertEqual(serializer.data['ep'], res.data['ep'])
+        self.assertEqual(serializer.data['content'], res.data['content'])
+    
+def test_list_mange_episodes(self):
+        """ทดสอบดึงข้อมูลทั้งหมด Episode Model"""
+        payload = {
+            'title': 'title',
+            'profile': '',
+            'author_by': 'author_by',
+            'draw_by': 'draw_by',
+            'upload_by': self.user,  
+        }
+        mange = Mange.objects.create(**payload)
+        Episode.objects.create(
+            mange_id=mange.id,
+            ep=1,
+            content="Test Content 1"
+        )
+        Episode.objects.create(
+            mange_id=mange.id,
+            ep=2,
+            content="Test Content 2"
+        )
+        episodes = Episode.objects.all()
+        serializer = EpisodeSerializer(episodes, many=True)
+        res = self.client.get(EPISODES_LIST_URL)
+        
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(json.loads(json.dumps(res.data)), serializer.data)

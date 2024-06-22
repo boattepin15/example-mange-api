@@ -23,14 +23,28 @@ class MangeImageserializer(serializers.ModelSerializer):
         }
 
 class EpisodeSerializer(serializers.ModelSerializer):
-    ''' สร้าง serializer สำหรับ ep หรือ ตอนสำหรับมังงะ'''
-    
-    # ใช้ PrimaryKeyRelatedField เพื่อให้แสดงเฉพาะ ID ของ Mange
-    #mange = serializers.PrimaryKeyRelatedField(queryset=Mange.objects.all())
-
-    # แสดง Json ของ Model Mange ด้วย MangeSerializer
+    ''' สร้าง serializer สำหรับ ep หรือ ตอนสำหรับมังงะ '''
+    mange_id = serializers.PrimaryKeyRelatedField(queryset=Mange.objects.all(), source='mange', write_only=True)
     mange = MangeSerializer(read_only=True)
+
     class Meta:
         model = Episode
-        fields = ['mange', 'ep','content']
+        fields = ['id', 'mange', 'mange_id', 'ep', 'content']
         read_only_fields = ['id']
+
+    def validate_ep(self, value):
+        """ตรวจสอบค่า ep"""
+        if value <= 0:
+            raise serializers.ValidationError('หมายเลขตอนต้องมากกว่าศูนย์')
+        return value
+
+    def validate(self, data):
+        """ตรวจสอบข้อมูลทั้งหมด"""
+        if 'mange' not in data:
+            raise serializers.ValidationError('ต้องระบุข้อมูลมังงะ')
+        return data
+
+    def create(self, validated_data):
+        mange = validated_data.pop('mange')
+        episode = Episode.objects.create(mange=mange, **validated_data)
+        return episode
